@@ -1,0 +1,35 @@
+catalog: maven_market_uc
+
+schemas:
+  bronze: bronze
+  silver: silver
+  gold: gold
+  audit: audit
+
+sources:
+  adls:
+    base_path: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net"
+    csv_transactions: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/landing/batch/transactions/"
+    csv_customers: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/landing/batch/customers/"
+    csv_regions: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/landing/batch/regions/"
+
+  mongodb:
+    uri_secret_scope: "maven_keyvault_scope"
+    uri_secret_key: "mongodb-connection-string"
+    database: "maven_market"
+    collection: "products"
+
+  kafka:
+    bootstrap_servers: "pkc-xxxx.eastus.azure.confluent.cloud:9092"
+    topic: "maven_orders_realtime"
+    secret_scope: "maven_keyvault_scope"
+    api_key_name: "kafka-api-key"
+    api_secret_name: "kafka-api-secret"
+    checkpoint_location: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/checkpoints/kafka_orders"
+
+tables:
+  bronze_transactions: "maven_market_uc.bronze.raw_transactions"
+  bronze_customers: "maven_market_uc.bronze.raw_customers"
+  bronze_regions: "maven_market_uc.bronze.raw_regions"
+  bronze_products: "maven_market_uc.bronze.raw_products"
+  bronze_kafka_orders: "maven_market_uc.bronze.raw_kafka_orders"
