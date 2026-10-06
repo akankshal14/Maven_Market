@@ -13,11 +13,15 @@ sources:
     csv_customers: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/landing/batch/customers/"
     csv_regions: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/landing/batch/regions/"
 
+
   mongodb:
-    uri_secret_scope: "maven_keyvault_scope"
-    uri_secret_key: "mongodb-connection-string"
-    database: "maven_market"
+    uri_secret_scope: "maven_scope"
+    uri_secret_key: "mongo-connection-uri"
+    database: "maven_market_db"
     collection: "products"
+
+
+  
 
   kafka:
     bootstrap_servers: "pkc-xxxx.eastus.azure.confluent.cloud:9092"
@@ -33,3 +37,4 @@ tables:
   bronze_regions: "maven_market_uc.bronze.raw_regions"
   bronze_products: "maven_market_uc.bronze.raw_products"
   bronze_kafka_orders: "maven_market_uc.bronze.raw_kafka_orders"
+  bronze_products: "bronze_products"
