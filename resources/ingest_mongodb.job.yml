@@ -1,0 +1,15 @@
+resources:
+  jobs:
+    ingest_mongodb:
+      name: maven_market_ingest_mongodb
+      tasks:
+        - task_key: ingest_mongodb
+          spark_python_task:
+            python_file: ../src/maven-market/ingest_mongodb.py
+          libraries:
+            - maven:
+                coordinates: org.mongodb.spark:mongo-spark-connector_2.12:10.4.0
+          new_cluster:
+            spark_version: 13.3.x-scala2.12
+            node_type_id: Standard_D4ds_v7
+            num_workers: 1

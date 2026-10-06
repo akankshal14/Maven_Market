@@ -16,7 +16,7 @@ sources:
 
   mongodb:
     uri_secret_scope: "maven_scope"
-    uri_secret_key: "mongo-connection-uri"
+    uri_secret_key: "maven-mongo-uri"
     database: "maven_market_db"
     collection: "products"
 
