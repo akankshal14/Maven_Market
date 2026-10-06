@@ -1,0 +1,40 @@
+# Declarative Automation Bundle definition for maven-market
+bundle:
+  name: maven-market
+  uuid: db688409-5bf7-42f7-8bf8-421bc9026cb0
+
+include:
+  - resources/*.yml
+
+# Variable declarations
+variables:
+  catalog:
+    description: The catalog to use
+  schema:
+    description: The schema to use
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-7405617210207715.15.azuredatabricks.net
+      root_path: /Shared/.bundle/${bundle.name}/${workspace.current_user.userName}/${bundle.target}
+    permissions:
+      - level: CAN_MANAGE
+        group_name: users
+    variables:
+      catalog: ws_mavenmarket
+      schema: maven_schema_dev
+
+  prod:
+    mode: production
+    workspace:
+      host: https://adb-7405617210207715.15.azuredatabricks.net
+      root_path: /Shared/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: ws_mavenmarket
+      schema: maven_schema_prod
+    permissions:
+      - user_name: akankshaslokhande14@gmail.com
+        level: CAN_MANAGE
