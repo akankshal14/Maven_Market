@@ -32,38 +32,52 @@ with open(config_path, "r") as f:
 logger = CustomLogger(spark, "batch_csv_ingestion")
 logger.log_start()
 
+base_adls = config["sources"]["adls"]["base_path"].rstrip("/")
+adls_sources = config["sources"]["adls"]
+
 try:
-    # Build ADLS Gen2 Checkpoint Paths dynamically
-    base_adls = config["sources"]["adls"]["base_path"].rstrip("/")
-    schema_path = f"{base_adls}/checkpoints/schema_transactions"
-    checkpoint_path = f"{base_adls}/checkpoints/write_transactions"
+    # Dynamically process every source key starting with 'csv_'
+    for key, source_path in adls_sources.items():
+        if not key.startswith("csv_"):
+            continue
 
-    # Auto Loader for Transactions CSV
-    raw_tx_df = (spark.readStream
-        .format("cloudFiles")
-        .option("cloudFiles.format", "csv")
-        .option("header", "true")
-        .option("cloudFiles.schemaLocation", schema_path)
-        .load(config["sources"]["adls"]["csv_transactions"])
-        .withColumn("_ingested_at", current_timestamp())
-        .withColumn("_source_file", col("_metadata.file_path")))
+        entity_name = key.replace("csv_", "")
 
-    # Write stream using availableNow trigger for reliable batch processing
-    query = (raw_tx_df.writeStream
-        .format("delta")
-        .outputMode("append")
-        .trigger(availableNow=True)
-        .option("checkpointLocation", checkpoint_path)
-        .toTable(config["tables"]["bronze_transactions"]))
-    
-    query.awaitTermination()
-    
-    # Log total count processed
-    rec_count = spark.table(config["tables"]["bronze_transactions"]).count()
-    logger.log_success(records_processed=rec_count)
+        # Look up table name in config['tables'] or fall back to default Unity Catalog naming
+        target_table = config.get("tables", {}).get(
+            f"bronze_{entity_name}", 
+            f"maven_market_uc.bronze.{entity_name}"
+        )
+
+        # Isolated schema inferencing and streaming checkpoints per dataset
+        schema_path = f"{base_adls}/checkpoints/schema_{entity_name}"
+        checkpoint_path = f"{base_adls}/checkpoints/write_{entity_name}"
+
+        # Ingest CSV stream using Auto Loader
+        raw_df = (
+            spark.readStream.format("cloudFiles")
+            .option("cloudFiles.format", "csv")
+            .option("header", "true")
+            .option("cloudFiles.schemaLocation", schema_path)
+            .load(source_path)
+            .withColumn("_ingested_at", current_timestamp())
+            .withColumn("_source_file", col("_metadata.file_path"))
+        )
+
+        # Write batch and block until finished for this table
+        query = (
+            raw_df.writeStream.format("delta")
+            .outputMode("append")
+            .trigger(availableNow=True)
+            .option("checkpointLocation", checkpoint_path)
+            .toTable(target_table)
+        )
+
+        query.awaitTermination()
+
+        rec_count = spark.table(target_table).count()
+        logger.log_success(records_processed=rec_count)
 
 except Exception as e:
     logger.log_failure(e)
     raise e
-
-
