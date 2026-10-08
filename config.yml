@@ -10,26 +10,33 @@ sources:
   adls:
     base_path: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net"
     csv_transactions: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/landing/batch/transactions/"
-    csv_customers: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/landing/batch/customers/"
     csv_regions: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/landing/batch/regions/"
-
+    csv_calender: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/landing/batch/calender/"
+    csv_stores: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/landing/batch/stores/"
+    csv_returns: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/landing/batch/returns/"
 
   mongodb:
     uri_secret_scope: "maven_scope"
     uri_secret_key: "maven-mongo-uri"
     database: "maven_market_db"
-    collection: "products"
-
-
-  
+    collections:
+      - name: "products"
+        table_key: "bronze_products"
+      - name: "customers"
+        table_key: "bronze_customers"
 
   kafka:
-    bootstrap_servers: "pkc-xxxx.eastus.azure.confluent.cloud:9092"
-    topic: "maven_orders_realtime"
-    secret_scope: "maven_keyvault_scope"
+    bootstrap_servers: "pkc-w77k7w.centralus.azure.confluent.cloud:9092"
+    secret_scope: "maven_scope"
     api_key_name: "kafka-api-key"
     api_secret_name: "kafka-api-secret"
-    checkpoint_location: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/checkpoints/kafka_orders"
+    streams:
+      - topic: "maven_orders"
+        target_table: "maven_market_uc.bronze.raw_kafka_orders"
+        checkpoint_location: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/checkpoints/kafka_orders"
+      - topic: "maven_inventory"
+        target_table: "maven_market_uc.bronze.raw_kafka_inventory"
+        checkpoint_location: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/checkpoints/kafka_inventory"
 
 tables:
   bronze_transactions: "maven_market_uc.bronze.raw_transactions"
@@ -37,4 +44,3 @@ tables:
   bronze_regions: "maven_market_uc.bronze.raw_regions"
   bronze_products: "maven_market_uc.bronze.raw_products"
   bronze_kafka_orders: "maven_market_uc.bronze.raw_kafka_orders"
-  bronze_products: "bronze_products"
