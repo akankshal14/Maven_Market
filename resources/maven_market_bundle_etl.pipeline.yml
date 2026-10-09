@@ -1,0 +1,9 @@
+resources:
+  pipelines:
+    maven_market_bundle_etl:
+      name: maven_market_bundle_etl
+      catalog: ${var.catalog}
+      libraries:
+        - file:
+            path: ../src/maven-market/dlt_medallion_pipeline.py
+      channel: CURRENT

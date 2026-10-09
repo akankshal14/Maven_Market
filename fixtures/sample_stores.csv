@@ -1,0 +1,4 @@
+store_id,store_name,store_region,country
+10,Maven Central,NA,USA
+20,Maven Berlin,EU,Germany
+30,Maven Tokyo,APAC,Japan
