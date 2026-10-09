@@ -1,9 +1,21 @@
+import os
 import dlt
 import yaml
 import pyspark.sql.functions as F
 
-# 1. Load Configuration (Hardcoded path for Notebook/UI testing)
-config_path = "/Workspace/Users/sameedmajgaonkar05@gmail.com/Maven_Market/config.yml"
+# 1. Dynamically locate config.yml relative to this script
+try:
+    _script_dir = os.path.dirname(os.path.abspath(__file__))
+except NameError:
+    _script_dir = os.getcwd()
+
+_repo_root = _script_dir
+while _repo_root != os.path.dirname(_repo_root):
+    if os.path.exists(os.path.join(_repo_root, "config.yml")):
+        break
+    _repo_root = os.path.dirname(_repo_root)
+
+config_path = os.path.join(_repo_root, "config.yml")
 
 with open(config_path, "r") as f:
     config = yaml.safe_load(f)
@@ -16,7 +28,8 @@ exp_inventory = config.get("expectations", {}).get("inventory", {})
 # Helper to get full table paths safely
 def get_table_path(key, default_name):
     base_catalog = config.get("catalog", "maven_market_uc")
-    return config.get("tables", {}).get(key, f"{base_catalog}.bronze.{default_name}")
+    path = config.get("tables", {}).get(key, f"{base_catalog}.bronze.{default_name}")
+    return path.replace("${catalog}", base_catalog)
 
 # -------------------------------------------------------------------
 # SILVER LAYER: Cleansing & Data Quality
