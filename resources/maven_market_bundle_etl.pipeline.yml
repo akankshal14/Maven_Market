@@ -7,3 +7,4 @@ resources:
         - file:
             path: ../src/maven-market/dlt_medallion_pipeline.py
       channel: CURRENT
+      serverless: true
