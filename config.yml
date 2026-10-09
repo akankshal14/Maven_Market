@@ -39,8 +39,37 @@ sources:
         checkpoint_location: "abfss://mavenmarket@sgmarketmaven.dfs.core.windows.net/checkpoints/kafka_inventory"
 
 tables:
-  bronze_transactions: "maven_market_uc.bronze.raw_transactions"
-  bronze_customers: "maven_market_uc.bronze.raw_customers"
-  bronze_regions: "maven_market_uc.bronze.raw_regions"
-  bronze_products: "maven_market_uc.bronze.raw_products"
-  bronze_kafka_orders: "maven_market_uc.bronze.raw_kafka_orders"
+  # Bronze Layer (Already configured)
+  bronze_customers: "${catalog}.bronze.raw_customers"
+  bronze_products: "${catalog}.bronze.raw_products"
+  bronze_transactions: "${catalog}.bronze.raw_transactions"
+  bronze_kafka_orders: "${catalog}.bronze.raw_kafka_orders"
+  bronze_kafka_inventory: "${catalog}.bronze.raw_kafka_inventory"
+  bronze_stores: "maven_market_uc.bronze.stores"
+  bronze_calendar: "maven_market_uc.bronze.calender"
+
+  # Silver Layer
+  silver_customers_scd2: "${catalog}.silver.customers_scd2"
+  silver_products: "${catalog}.silver.cleansed_products"
+  silver_transactions: "${catalog}.silver.cleansed_transactions"
+  silver_orders: "${catalog}.silver.cleansed_orders"
+  silver_inventory: "${catalog}.silver.cleansed_inventory"
+  silver_stores: "${catalog}.silver.cleansed_stores"
+  silver_calendar: "${catalog}.silver.cleansed_calendar"
+
+  # Gold Layer
+  gold_fact_sales: "${catalog}.gold.fact_sales"
+  gold_dim_customers: "${catalog}.gold.dim_customers"
+  gold_dim_products: "${catalog}.gold.dim_products"
+  gold_dim_stores: "${catalog}.gold.dim_stores"
+
+expectations:
+  transactions:
+    valid_quantity: "quantity > 0"
+  orders:
+    valid_order_id: "order_id IS NOT NULL"
+    valid_quantity: "quantity > 0"
+  inventory:
+    valid_stock: "stock_level >= 0"
+  customers:
+    valid_email: "email LIKE '%@%'"
