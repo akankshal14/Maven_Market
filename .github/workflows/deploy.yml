@@ -51,7 +51,7 @@ jobs:
       - name: Setup Databricks CLI
         uses: databricks/setup-cli@main
 
-      - name: Validate & Deploy Bundle to Dev
+      - name: Validate, Deploy & Run Bundle on Dev
         if: github.ref == 'refs/heads/dev'
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
@@ -59,8 +59,9 @@ jobs:
         run: |
           databricks bundle validate -t dev
           databricks bundle deploy -t dev
+          databricks bundle run maven_market_bundle_etl -t dev
 
-      - name: Validate & Deploy Bundle to Production
+      - name: Validate, Deploy & Run Bundle on Production
         if: github.ref == 'refs/heads/main'
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
@@ -68,3 +69,4 @@ jobs:
         run: |
           databricks bundle validate -t prod
           databricks bundle deploy -t prod
+          databricks bundle run maven_market_bundle_etl -t prod
