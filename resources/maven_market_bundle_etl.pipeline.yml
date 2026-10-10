@@ -1,11 +1,12 @@
 resources:
   pipelines:
     maven_market_bundle_etl:
-      name: maven_market_bundle_etl
+      name: ${bundle.target}-maven-market-bundle-etl
       catalog: ${var.catalog}
-      schema: default  
+      target: silver              # Changed 'schema:' to 'target:'
+      serverless: true
+      channel: CURRENT
       libraries:
         - file:
             path: ../src/maven-market/dlt_medallion_pipeline.py
-      channel: CURRENT
-      serverless: true
+
