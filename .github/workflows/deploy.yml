@@ -39,7 +39,6 @@ jobs:
         run: |
           pytest tests/ --verbose
 
-
   deploy-dabs:
     name: Deploy Databricks Asset Bundle (DABs)
     needs: lint-and-test
