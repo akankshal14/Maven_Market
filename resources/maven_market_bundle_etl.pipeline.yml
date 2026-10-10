@@ -3,7 +3,7 @@ resources:
     maven_market_bundle_etl:
       name: ${bundle.target}-maven-market-bundle-etl
       catalog: ${var.catalog}
-      target: silver              # Changed 'schema:' to 'target:'
+      target: silver            
       serverless: true
       channel: CURRENT
       libraries:
